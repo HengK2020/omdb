@@ -1,24 +1,41 @@
+
 /*!
 By: Aziz Moalim
 7.43
-Give me a summary of m_link_type. The result set should contain the count of each m_link_type. 
+
+EXPLAIN BEFORE & AFTER HERE GITHUB FOLDER:aziziteration10explainpictures
+
+
+
+Used LIMIT to stop the query from scanning addiontal rows since we only care about 3 of them and to prevent duplicate - lowers time
+Adding an index:
+
+ALTER TABLE movie_media ADD INDEX idx(m_link_type);
 
 This is the over 100,000 data set:
 This is used on 1,175,493 rows and returns the below time
 Showing rows 0 - 2 (3 total, Query took 0.8430 seconds.)
+
+SELECT m_link_type, count(*)
+FROM movie_media
+GROUP BY m_link_type
+LIMIt 3
+
 
 This is the orginal data:
 
 This is used on 18 rows and returns the below time
 Showing rows 0 - 2 (3 total, Query took 0.0011 seconds.)
 
+SELECT m_link_type, count(*)
+FROM movie_media
+GROUP BY m_link_type;
+
 
 
 */
 
-SELECT m_link_type, count(*)
-FROM movie_media
-GROUP BY m_link_type;
+
 
 /*
 
@@ -58,6 +75,57 @@ ref = Null and omdb2.people_trivia.people_id
 rows = 62366 and 1
 Extra = 
 Showing rows 0 - 2 (3 total, Query took 0.0011 seconds.)
+
+*/
+
+/*!
+Query 10: Get the list of trivia for the songs. 
+By Sharmarke Mohamed
+SELECT song_trivia.song_trivia_id, song_trivia.song_trivia_name, songs.song_id, songs.title, songs.lyrics, songs.theme 
+from song_trivia 
+join songs 
+on (songs.song_id = song_trivia.song_id)
+
+Explain:
+id = 1 and 1
+select_type = SIMPLE and SIMPLE
+table = song_trivia and songs
+partitions = NULL and NULL
+type = ALL and eq_ref
+possible_keys = NULL and PRIMARY
+key = NULL and PRIMARY
+key_len = NULL and 4
+ref = NULL and omdb.song_trivia.song_id
+rows = 256 and 1
+filtered = 100 and 100
+Extra = NULL and NULL
+Showing rows 0 - 24 (256 total, Query took 0.0006 seconds.)
+
+New Query 10:
+SELECT song_trivia.song_trivia_id, song_trivia.song_trivia_name, songs.song_id, songs.title, songs.lyrics, songs.theme 
+FROM song_trivia 
+JOIN songs on (songs.song_id = song_trivia.song_id) 
+WHERE song_trivia.song_trivia_id BETWEEN 1 AND 8 
+LIMIT 8
+
+CHANGES: I added WHERE and BETWEEN, to further lower the amount of rows(i want the 8 unique rows).
+I then changed the syntax, making the FROM, and JOIN capital letters. LIMIT decreased the time by 1.
+
+Explain:
+id = 1 and 1
+select_type = SIMPLE and SIMPLE
+table = song_trivia and songs
+partitions = NULL and NULL
+type = range and eq_ref
+possible_keys = PRIMARY and PRIMARY
+key = NULL and PRIMARY
+key_len = 4 and 4
+ref = NULL and omdb.song_trivia.song_id
+rows = 8 and 1
+filtered = 100 and 100
+Extra = using WHERE and NULL
+Showing rows 0 - 7 (8 total, Query took 0.0004 seconds.)
+
 
 */
 
